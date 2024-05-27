@@ -1,0 +1,180 @@
+#include "Ultrasonic.h"
+
+//Declaração dos pinos----------------------------------------------------------------------------------
+//----Motor
+
+//motor_A
+int IN1 = 11;
+int IN2 = 10;
+int velocidadeA = 6;
+
+//motor_B
+int IN3 = 9;
+int IN4 = 3;
+int velocidadeB = 5;
+
+//----Ultrassonico
+
+#define pinEcho 13     // (RECEBE)
+#define pinTrigger 12  // (ENVIA)
+
+Ultrasonic ultrasonico(pinEcho, pinTrigger);
+
+
+//----Infravermelho
+
+#define pinSenfren 8
+#define pinSentras 7
+
+//Variaveis de controle-------------------------------------------------------------------------------------
+
+//----Va.Con.Motor
+
+int velocidade = 0;
+
+//----Va.Con.Ultrassonico
+
+float dist;
+String result;
+
+const int Dist_segura = 30;
+int distancia;
+
+//----Va.Con.Infravermelho
+int LeituraSensorF;
+int LeituraSensorT;
+
+
+// Inicializa Pinos--------------------------------------------------------------------------------------------
+void setup() {
+  // configura os pinos do sensor ultrassonico
+  Serial.begin(9600);        // inicializa a porta serial
+  pinMode(pinEcho, INPUT);      // entrada
+  pinMode(pinTrigger, OUTPUT);  // saida
+  Serial.begin(9600);        // inicializa a porta serial
+
+  // configuraç˜ao pinos sensor infravermelho
+  pinMode(pinSentras, INPUT);  // infravermelho tras
+  pinMode(pinSenfren, INPUT);  // infravermelho frente
+  Serial.begin(9600);
+
+  // configura os pinos do driver de motor
+  pinMode(IN1, OUTPUT);          // saida
+  pinMode(IN2, OUTPUT);          // saida
+  pinMode(IN3, OUTPUT);          // saida
+  pinMode(IN4, OUTPUT);          // saida
+  pinMode(velocidadeA, OUTPUT);  // saida
+  pinMode(velocidadeB, OUTPUT);  // saida
+}
+
+void parar(void) {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+void girarDIR(void) {
+  parar();
+  //-----Motor A(Direção)
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  //-----Motor B(Desligado)
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+void girarESQ(void) {
+  parar();
+  //-----Motor A(Desligado)
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  //-----Motor B(Direção)
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void frente(void) {
+  parar();
+  //-----Motor A(D.contraria)
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  //-----Motor B(desligado)
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+void tras(void) {
+  parar();
+  //-----Motor A
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  //-----Motor B
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void infra() {
+  LeituraSensorF = digitalRead(pinSenfren);
+  LeituraSensorT = digitalRead(pinSentras);
+  Serial.print("Leitura do sensor frente: ");
+  Serial.println(LeituraSensorF);
+  Serial.print("Leitura do sensor tras: ");
+  Serial.println(LeituraSensorT);
+  if (LeituraSensorF == LOW) {  //Se a leitura do sensor for igual a LOW..
+    analogWrite(velocidadeA, 95);
+    analogWrite(velocidadeB, 95);
+    tras();
+    delay(1000);
+    girarDIR();
+    delay(1000);
+    Serial.println("high");
+    //delay(200);
+  } else if (LeituraSensorT == LOW) {
+    analogWrite(velocidadeA, 95);
+    analogWrite(velocidadeB, 95);
+    frente();
+    delay(1000);
+    Serial.println("high");
+    //delay(200);
+  } else {  // Se o valor de leitura do sensor NÃO for igual a LOW
+    Serial.println("Low");
+  }
+}
+
+
+
+void loop() {
+
+  delay(5000);
+
+  infra();
+  digitalWrite(pinTrigger, LOW);
+  delayMicroseconds(5);
+  digitalWrite(pinTrigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pinTrigger, LOW);
+  dist = pulseIn(pinEcho, HIGH);
+  dist = dist / 30;
+  Serial.print("Distancia = ");
+  Serial.print(dist);
+  Serial.println(" cm");
+  delay(200);
+
+
+  
+
+  //infravermelho
+  if (pinSentras) {
+    analogWrite(velocidadeA, 95);
+    analogWrite(velocidadeB, 95);
+    frente();
+  } else if (pinSenfren) {
+    analogWrite(velocidadeA, 95);
+    analogWrite(velocidadeB, 95);
+    tras();
+  }
+}
