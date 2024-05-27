@@ -44,29 +44,6 @@ int distancia;
 int LeituraSensorF;
 int LeituraSensorT;
 
-
-// Inicializa Pinos--------------------------------------------------------------------------------------------
-void setup() {
-  // configura os pinos do sensor ultrassonico
-  Serial.begin(9600);        // inicializa a porta serial
-  pinMode(pinEcho, INPUT);      // entrada
-  pinMode(pinTrigger, OUTPUT);  // saida
-  Serial.begin(9600);        // inicializa a porta serial
-
-  // configuraç˜ao pinos sensor infravermelho
-  pinMode(pinSentras, INPUT);  // infravermelho tras
-  pinMode(pinSenfren, INPUT);  // infravermelho frente
-  Serial.begin(9600);
-
-  // configura os pinos do driver de motor
-  pinMode(IN1, OUTPUT);          // saida
-  pinMode(IN2, OUTPUT);          // saida
-  pinMode(IN3, OUTPUT);          // saida
-  pinMode(IN4, OUTPUT);          // saida
-  pinMode(velocidadeA, OUTPUT);  // saida
-  pinMode(velocidadeB, OUTPUT);  // saida
-}
-
 void parar(void) {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
@@ -147,10 +124,32 @@ void infra() {
 
 
 
-void loop() {
+// Inicializa Pinos--------------------------------------------------------------------------------------------
+void setup() {
+  // configura os pinos do sensor ultrassonico
+  Serial.begin(9600);        // inicializa a porta serial
+  pinMode(pinEcho, INPUT);      // entrada
+  pinMode(pinTrigger, OUTPUT);  // saida
+  Serial.begin(9600);        // inicializa a porta serial
 
+  // configuraç˜ao pinos sensor infravermelho
+  pinMode(pinSentras, INPUT);  // infravermelho tras
+  pinMode(pinSenfren, INPUT);  // infravermelho frente
+  Serial.begin(9600);
+
+  // configura os pinos do driver de motor
+  pinMode(IN1, OUTPUT);          // saida
+  pinMode(IN2, OUTPUT);          // saida
+  pinMode(IN3, OUTPUT);          // saida
+  pinMode(IN4, OUTPUT);          // saida
+  pinMode(velocidadeA, OUTPUT);  // saida
+  pinMode(velocidadeB, OUTPUT);  // saida
+  parar();
   delay(5000);
+}
 
+
+void loop() {
   infra();
   digitalWrite(pinTrigger, LOW);
   delayMicroseconds(5);
