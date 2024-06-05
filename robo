@@ -1,0 +1,242 @@
+#include <Ultrasonic.h>
+
+
+// Declaração dos pinos----------------------------------------------------------------------------------
+//----Motor
+
+// motor_A
+int IN1 = 11;
+int IN2 = 10;
+int velocidadeA = 6;
+
+// motor_B
+int IN3 = 9;
+int IN4 = 4;
+int velocidadeB = 5;
+
+//----Ultrassonico
+
+#define pinEcho 12 // (RECEBE)
+#define pinTrig 13 // (ENVIA)
+//#define dist_sec 200
+Ultrasonic ultrasonic(pinTrig, pinEcho);
+
+//----Infravermelho
+
+#define pinSenfren 8
+#define pinSentras 7
+
+
+// Variaveis de controle-------------------------------------------------------------------------------------
+
+//----Va.Con.Motor
+
+int velocidade = 0;
+
+//----Va.Con.Infravermelho
+int LeituraSensorF;
+int LeituraSensorT;
+
+float distancia, dist;
+
+void parar(void)
+{
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW); 
+}
+
+void girarDIR(void)
+{
+  parar();
+  //-----Motor A(Direção)
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  //-----Motor B(Desligado)
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+void girarESQ(void)
+{
+  parar();
+  //-----Motor A(Desligado)
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  //-----Motor B(Direção)
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void frente(void)
+{
+  parar();
+  //-----Motor A(D.contraria)
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  //-----Motor B(desligado)
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+void tras(void)
+{
+  parar();
+  //-----Motor A
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  //-----Motor B
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+int infra()
+{
+  LeituraSensorF = digitalRead(pinSenfren);
+  LeituraSensorT = digitalRead(pinSentras);
+
+  /*Serial.print("Leitura do sensor frente: ");
+  Serial.println(LeituraSensorF);
+  Serial.print("Leitura do sensor tras: ");
+  Serial.println(LeituraSensorT);*/
+
+  if (LeituraSensorF == LOW)
+  { // Se a leitura do sensor for igual a LOW..
+    analogWrite(velocidadeA, 100);
+    analogWrite(velocidadeB, 100);
+    tras();
+    girarDIR();
+    /*Serial.println("high");*/
+    return LeituraSensorF = 0;
+    // delay(200);
+  }
+  else if (LeituraSensorT == LOW)
+  {
+    analogWrite(velocidadeA, 100);
+    analogWrite(velocidadeB, 100);
+    frente();
+    /*Serial.println("high");*/
+    return LeituraSensorT = 0;
+    // delay(200);
+  }
+  else
+  { // Se o valor de leitura do sensor NÃO for igual a LOW
+    Serial.println("Low");
+  }
+}
+
+int ultra()
+{
+  infra();
+
+ /* if((millis() - tempo)>200){
+    distancia = sensorUltra.pin_cm();
+    tempo = millis();
+  }*/
+
+  digitalWrite(pinTrig,LOW);
+  delayMicroseconds(5);        
+  digitalWrite(pinTrig,HIGH);  
+  delayMicroseconds(10);      
+  digitalWrite(pinTrig,LOW); 
+  dist=pulseIn(pinEcho,HIGH); 
+  dist = dist/58;              
+  Serial.print ("Distancia = ");
+  Serial.print (dist);         
+  Serial.println (" cm");                 
+  //delay (200);
+
+  
+
+  if(distancia <= 10){
+    analogWrite(velocidadeA, 130);
+    analogWrite(velocidadeB, 130);
+    frente();
+  } else {
+    analogWrite(velocidadeA, 90);
+    analogWrite(velocidadeB, 0);
+    girarDIR();
+  }
+  Serial.print("Distancia: ");
+  Serial.print(distancia);
+  Serial.println(" cm");
+
+
+  /*int distancia = sensorUltra.ping_cm();
+  if (distancia <= dist_sec)
+  {
+    analogWrite(velocidadeA, 220);
+    analogWrite(velocidadeB, 220);
+    frente();
+    Serial.println("modo avançar");
+  }
+  else
+  {
+    analogWrite(velocidadeA, 100);
+    analogWrite(velocidadeB, 100);
+    frente();
+    delay(500);
+    analogWrite(velocidadeA, 80);
+    analogWrite(velocidadeB, 80);
+    girarDIR();
+    Serial.println("modo procurando");
+  }*/
+
+  return distancia;
+}
+
+void trataInterrupcao() {
+  // Código a ser executado quando a interrupção ocorrer
+  infra();
+  ultra();
+}
+
+// Inicializa Pinos--------------------------------------------------------------------------------------------
+void setup()
+{
+  // configura os pinos do sensor ultrassonico
+  Serial.begin(9600); // inicializa a porta serial
+
+  // configuraç˜ao pinos sensor infravermelho
+  pinMode(pinSentras, INPUT); // infravermelho tras
+  pinMode(pinSenfren, INPUT); // infravermelho frente
+
+  attachInterrupt(pinSenfren(3), trataInterrupcao,RISING);
+
+  Serial.begin(9600);
+
+  Serial.begin(9600);
+  pinMode(pinTrig,OUTPUT);
+  pinMode(pinEcho,INPUT);
+
+
+  // configura os pinos do driver de motor
+  pinMode(IN1, OUTPUT);         // saida
+  pinMode(IN2, OUTPUT);         // saida
+  pinMode(IN3, OUTPUT);         // saida
+  pinMode(IN4, OUTPUT);         // saida
+  pinMode(velocidadeA, OUTPUT); // saida
+  pinMode(velocidadeB, OUTPUT); // saida
+  parar();
+  delay(5000);
+}
+
+void loop()
+{
+  
+    
+  /*
+  if(infra() == 0) {
+    infra();
+    Serial.println("entrou na funcao infra");
+  } else {
+    ultra();
+    Serial.println("Entrou na funcao ultra");
+  }*/
+  
+  
+}
