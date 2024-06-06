@@ -23,8 +23,8 @@ Ultrasonic ultrasonic(pinTrig, pinEcho);
 
 //----Infravermelho
 
-#define pinSenfren 8
-#define pinSentras 7
+#define pinSenfren 2
+#define pinSentras 3 
 
 
 // Variaveis de controle-------------------------------------------------------------------------------------
@@ -131,7 +131,6 @@ int infra()
 
 int ultra()
 {
-  infra();
 
  /* if((millis() - tempo)>200){
     distancia = sensorUltra.pin_cm();
@@ -192,7 +191,6 @@ int ultra()
 void trataInterrupcao() {
   // Código a ser executado quando a interrupção ocorrer
   infra();
-  ultra();
 }
 
 // Inicializa Pinos--------------------------------------------------------------------------------------------
@@ -205,8 +203,8 @@ void setup()
   pinMode(pinSentras, INPUT); // infravermelho tras
   pinMode(pinSenfren, INPUT); // infravermelho frente
 
-  attachInterrupt(pinSenfren(3), trataInterrupcao,RISING);
-
+  attachInterrupt(digitalPinToInterrupt(pinSenfren), trataInterrupcao,FALLING);
+  attachInterrupt(digitalPinToInterrupt(pinSentras), trataInterrupcao,FALLING);
   Serial.begin(9600);
 
   Serial.begin(9600);
@@ -229,14 +227,7 @@ void loop()
 {
   
     
-  /*
-  if(infra() == 0) {
-    infra();
-    Serial.println("entrou na funcao infra");
-  } else {
-    ultra();
-    Serial.println("Entrou na funcao ultra");
-  }*/
+  ultra();
   
   
 }
